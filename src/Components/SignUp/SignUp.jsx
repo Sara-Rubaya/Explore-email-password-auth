@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { auth } from '../../Firebase.init';
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -11,6 +11,8 @@ const SignUp = () => {
 
     const handleSignUp = (e) => {
         e.preventDefault();
+        const name = e.target.name.value;
+        const photo = e.target.photo.value;
         const email = e.target.email.value;
         const password = e.target.password.value;
         const terms = e.target.terms.checked;
@@ -39,10 +41,23 @@ const SignUp = () => {
 
                 //email varify
                 sendEmailVerification(auth.currentUser)
-                .the(() =>{
+                .then(() =>{
                     setSuccess(true);
                     alert('We sent you a verification email.Please check your email.')
                 })
+
+                //update user profile
+                const profile = {
+                    displayName:name,
+                    photoURL:photo
+                }
+                updateProfile(auth.currentUser, profile)
+                .then(() =>{
+                    console.log('User profile updated.')
+                })
+                .catch(error =>{
+                       console.log(error);
+                } )
             })
             .catch((error) => {
                 console.log(error);
@@ -55,8 +70,15 @@ const SignUp = () => {
             <div className="card-body">
                 <h1 className="text-3xl font-bold">Please Sign Up now!</h1>
                 <form className='fieldset' onSubmit={handleSignUp}>
+                    <label className="label mt-2">Name</label>
+                    <input type="text" name='name' className="input" placeholder="Your Name" />
+                    <label className="label">Photo Url</label>
+                    <input type="text" name='photo' className="input" placeholder="Photo url" />
                     <label className="label">Email</label>
                     <input type="email" name='email' className="input" placeholder="Email" />
+
+
+
                     <label className="label">Password</label>
                    <div className='relative '>
                    <input
